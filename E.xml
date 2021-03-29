@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<nodes>
+    <charSet>0</charSet>
+    <node>
+        <name>q0</name>
+        <type>START</type>
+        <e>q1,q2</e>
+    </node>
+    <node>
+        <name>q1</name>
+        <type>NORMAL</type>
+        <e>q2</e>
+    </node>
+    <node>
+        <name>q2</name>
+        <type>NORMAL</type>
+        <change>
+            <charSet>0</charSet>
+            <next>q3</next>
+        </change>
+        <e>q3</e>
+    </node>
+    <node>
+        <name>q3</name>
+        <type>NORMAL</type>
+        <e>q4</e>
+    </node>
+    <node>
+        <name>q4</name>
+        <type>NORMAL</type>
+        <e>q5</e>
+    </node>
+    <node>
+        <name>q5</name>
+        <type>END</type>
+    </node>
+</nodes>
