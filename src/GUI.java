@@ -50,20 +50,17 @@ public class GUI {
         buttonConvert.setBounds(150, 50, 100, 50);
         buttonConvert.addActionListener(e -> {
             String source = label.getText();
-            if (!source.equals("文件名") && !source.equals("ERROR_READ") && !source.equals("ERROR_WRITE")) {
-                NodeList NFA = new NodeList();
-                boolean flagLoad = NFA.loadFromXml(source);
-                if (flagLoad) {
+            if (!source.equals("文件名") && !source.equals("ERROR")) {
+                try {
+                    NodeList NFA = new NodeList();
+                    NFA.loadFromXml(source);
                     NFA.parseNFAWithoutE();
                     NFA.generateXML("WithoutE.xml");
                     NodeList DFA = NFA.parseDFA();
-                    boolean flagGenerate = DFA.generateXML("DFA.xml");
-                    if (flagGenerate)
-                        System.exit(0);
-                    else
-                        label.setText("ERROR_WRITE");
-                } else {
-                    label.setText("ERROR_READ");
+                    DFA.generateXML("DFA.xml");
+                    System.exit(0);
+                } catch (Exception exception) {
+                    label.setText("ERROR");
                 }
             }
         });

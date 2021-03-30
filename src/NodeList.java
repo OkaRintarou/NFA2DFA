@@ -6,7 +6,6 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -102,41 +101,35 @@ public class NodeList {
      * 从xml文档读入NFA
      *
      * @param file 文件名（需要包含位置）
-     * @return 是否运行成功
      */
-    public boolean loadFromXml(String file) {
-        try {
-            SAXReader saxReader = new SAXReader();
-            Document document = saxReader.read(file);
-            Element rootElement = document.getRootElement();
-            String str_charSet = rootElement.elementTextTrim("charSet");
-            String[] strings = str_charSet.split(",");
-            this.charSet.addAll(Arrays.asList(strings));
-            List<Element> nodeElements = rootElement.elements("node");
-            for (var nodeEle : nodeElements) {
-                Node node = new Node();
-                node.addName(nodeEle.elementTextTrim("name"));
-                node.generateName();
-                node.setType(nodeEle.elementTextTrim("type"));
-                List<Element> changeList = nodeEle.elements("change");
-                for (var changeEle : changeList) {
-                    String charSet = changeEle.elementTextTrim("charSet");
-                    String next = changeEle.elementTextTrim("next");
-                    node.addChange(charSet, next);
-                }
-                String e = nodeEle.elementTextTrim("e");
-                if (e != null) {
-                    String[] es = e.split(",");
-                    for (var item : es) {
-                        node.addE(item);
-                    }
-                }
-                nodes.add(node);
+    public void loadFromXml(String file) throws Exception {
+        SAXReader saxReader = new SAXReader();
+        Document document = saxReader.read(file);
+        Element rootElement = document.getRootElement();
+        String str_charSet = rootElement.elementTextTrim("charSet");
+        String[] strings = str_charSet.split(",");
+        this.charSet.addAll(Arrays.asList(strings));
+        List<Element> nodeElements = rootElement.elements("node");
+        for (var nodeEle : nodeElements) {
+            Node node = new Node();
+            node.addName(nodeEle.elementTextTrim("name"));
+            node.generateName();
+            node.setType(nodeEle.elementTextTrim("type"));
+            List<Element> changeList = nodeEle.elements("change");
+            for (var changeEle : changeList) {
+                String charSet = changeEle.elementTextTrim("charSet");
+                String next = changeEle.elementTextTrim("next");
+                node.addChange(charSet, next);
             }
-        } catch (Exception e) {
-            return false;
+            String e = nodeEle.elementTextTrim("e");
+            if (e != null) {
+                String[] es = e.split(",");
+                for (var item : es) {
+                    node.addE(item);
+                }
+            }
+            nodes.add(node);
         }
-        return true;
     }
 
     /**
@@ -275,35 +268,29 @@ public class NodeList {
      * 将转换后的DFA写入xml文档
      *
      * @param file 文件名（需包含位置）
-     * @return 是否运行成功
      */
-    public boolean generateXML(String file) {
-        try {
-            Document document = DocumentHelper.createDocument();
-            Element root = document.addElement("nodes");
-            StringBuilder charSet_str = new StringBuilder();
-            for (var str : this.charSet) {
-                charSet_str.append(str).append(",");
-            }
-            charSet_str.deleteCharAt(charSet_str.length() - 1);
-            root.addElement("charSet").setText(charSet_str.toString());
-            for (var node : nodes) {
-                Element nodeEle = root.addElement("node");
-                nodeEle.addElement("name").setText(node.getName());
-                nodeEle.addElement("type").setText(node.getType());
-                for (Map.Entry<String, String> change : node.changeSet.entrySet()) {
-                    Element changeSet = nodeEle.addElement("change");
-                    changeSet.addElement("charSet").setText(change.getKey());
-                    changeSet.addElement("next").setText(change.getValue());
-                }
-            }
-            OutputFormat outputFormat = OutputFormat.createPrettyPrint();
-            XMLWriter xmlWriter = new XMLWriter(new FileOutputStream(file), outputFormat);
-            xmlWriter.write(document);
-            xmlWriter.close();
-        } catch (IOException e) {
-            return false;
+    public void generateXML(String file) throws Exception {
+        Document document = DocumentHelper.createDocument();
+        Element root = document.addElement("nodes");
+        StringBuilder charSet_str = new StringBuilder();
+        for (var str : this.charSet) {
+            charSet_str.append(str).append(",");
         }
-        return true;
+        charSet_str.deleteCharAt(charSet_str.length() - 1);
+        root.addElement("charSet").setText(charSet_str.toString());
+        for (var node : nodes) {
+            Element nodeEle = root.addElement("node");
+            nodeEle.addElement("name").setText(node.getName());
+            nodeEle.addElement("type").setText(node.getType());
+            for (Map.Entry<String, String> change : node.changeSet.entrySet()) {
+                Element changeSet = nodeEle.addElement("change");
+                changeSet.addElement("charSet").setText(change.getKey());
+                changeSet.addElement("next").setText(change.getValue());
+            }
+        }
+        OutputFormat outputFormat = OutputFormat.createPrettyPrint();
+        XMLWriter xmlWriter = new XMLWriter(new FileOutputStream(file), outputFormat);
+        xmlWriter.write(document);
+        xmlWriter.close();
     }
 }
