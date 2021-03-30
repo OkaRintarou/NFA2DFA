@@ -24,7 +24,8 @@ public class NodeList {
 
     /**
      * 判断一个状态是否在自动机的状态集中出现过
-     * @param name 待判断状态
+     *
+     * @param name  待判断状态
      * @param nodes 状态集
      * @return boolean
      */
@@ -46,16 +47,16 @@ public class NodeList {
             TreeSet<String> nameSet = new TreeSet<>(node.getNameSet());
             //获取e-closure
             boolean flag;
-            Node tmp=node;
-            TreeSet<String> tmpSet=new TreeSet<>(tmp.getE());
+            Node tmp = node;
+            TreeSet<String> tmpSet = new TreeSet<>(tmp.getE());
             do {
-                flag=nameSet.addAll(tmpSet);
+                flag = nameSet.addAll(tmpSet);
                 tmpSet.clear();
-                for(var state:nameSet){
-                    tmp=findNode(state);
+                for (var state : nameSet) {
+                    tmp = findNode(state);
                     tmpSet.addAll(tmp.getE());
                 }
-            }while(flag);
+            } while (flag);
             //遍历输入集
             for (var key : this.charSet) {
                 //获取e-closure通过输入可到达的状态
@@ -70,19 +71,19 @@ public class NodeList {
                 }
                 //对可到达状态获取e-closure
                 tmpSet.clear();
-                TreeSet<String>nameSet_2=new TreeSet<>();
+                TreeSet<String> nameSet_2 = new TreeSet<>();
                 for (var name : allDestiny) {
                     Node find = findNode(name);
                     tmpSet.addAll(find.getE());
                 }
                 do {
-                    flag=nameSet_2.addAll(tmpSet);
+                    flag = nameSet_2.addAll(tmpSet);
                     tmpSet.clear();
-                    for(var state:nameSet_2){
-                        tmp=findNode(state);
+                    for (var state : nameSet_2) {
+                        tmp = findNode(state);
                         tmpSet.addAll(tmp.getE());
                     }
-                }while(flag);
+                } while (flag);
                 //合并集合，并更新转换函数
                 allDestiny.addAll(nameSet_2);
                 if (allDestiny.size() != 0) {
@@ -99,9 +100,11 @@ public class NodeList {
 
     /**
      * 从xml文档读入NFA
+     *
      * @param file 文件名（需要包含位置）
+     * @return 是否运行成功
      */
-    public void loadFromXml(String file) {
+    public boolean loadFromXml(String file) {
         try {
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(file);
@@ -131,14 +134,14 @@ public class NodeList {
                 nodes.add(node);
             }
         } catch (Exception e) {
-            System.err.println("未打开文件");
-            e.printStackTrace();
-            System.exit(-1);
+            return false;
         }
+        return true;
     }
 
     /**
      * 寻找起始状态
+     *
      * @return 起始状态
      */
     public Node findSTART() {
@@ -152,6 +155,7 @@ public class NodeList {
 
     /**
      * 添加状态
+     *
      * @param node 状态
      */
     public void add(Node node) {
@@ -160,6 +164,7 @@ public class NodeList {
 
     /**
      * 添加输入集
+     *
      * @param charSet 输入集
      */
     public void addCharSet(ArrayList<String> charSet) {
@@ -169,6 +174,7 @@ public class NodeList {
     /**
      * 将NFA转换为DFA<br/>
      * 可对DFA操作，无变化
+     *
      * @return DFA
      */
     public NodeList parseDFA() {
@@ -217,6 +223,7 @@ public class NodeList {
 
     /**
      * 查找状态
+     *
      * @param name 状态名
      * @return 找到的状态，未找到返回null
      */
@@ -230,6 +237,7 @@ public class NodeList {
 
     /**
      * 判断状态类型
+     *
      * @param node 状态
      * @return 状态类型
      */
@@ -254,6 +262,7 @@ public class NodeList {
 
     /**
      * 获取状态类型，需要该状态已经分配类型
+     *
      * @param name 状态名
      * @return 状态类型
      */
@@ -264,9 +273,11 @@ public class NodeList {
 
     /**
      * 将转换后的DFA写入xml文档
+     *
      * @param file 文件名（需包含位置）
+     * @return 是否运行成功
      */
-    public void generateXML(String file) {
+    public boolean generateXML(String file) {
         try {
             Document document = DocumentHelper.createDocument();
             Element root = document.addElement("nodes");
@@ -291,9 +302,8 @@ public class NodeList {
             xmlWriter.write(document);
             xmlWriter.close();
         } catch (IOException e) {
-            System.err.println("写入失败");
-            e.printStackTrace();
-            System.exit(-1);
+            return false;
         }
+        return true;
     }
 }
